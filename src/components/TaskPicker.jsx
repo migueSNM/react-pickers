@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+
 
 const styles = {
   list: {
@@ -26,13 +29,6 @@ class TaskPicker extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
-
-    const fullList = (
-      <div className={classes.fullList}>
-        Listado
-      </div>
-    );
 
     return (
       <div>
@@ -42,7 +38,30 @@ class TaskPicker extends React.Component {
           open={this.state.bottom}
           onClose={this.toggleDrawer('bottom', false)}
         >
-            {fullList}
+          <Query
+            query={gql`
+              query tasks {
+                tasks {
+                  docs {
+                    _id
+                    code
+                    name
+                  }
+                }
+              }
+            `}
+          >
+            {({ loading, error, data }) => {
+              if (loading) return <p>Loading...</p>;
+              if (error) return <p>Error :(</p>;
+
+              return data.tasks.docs.map(({ code, name }) => (
+                <div key={code}>
+                  <p>{code}: {name}</p>
+                </div>
+              ));
+            }}
+          </Query>
         </Drawer>
       </div>
     );
