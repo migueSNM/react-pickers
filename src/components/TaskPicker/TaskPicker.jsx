@@ -7,6 +7,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
+import Divider from '@material-ui/core/Divider';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
@@ -84,6 +85,13 @@ class TaskPicker extends React.Component {
 
               return (
                 <List className={classes.taskList}>
+                  <ListItem role={undefined} dense className={classes.taskListItem}>
+                    <Checkbox disabled />
+                    <ListItemText className={classes.taskListItemText} secondary={`Code`} />
+                    <ListItemText className={classes.taskListItemText} secondary={`Name`} />
+                    <ListItemText className={classes.taskListItemText} secondary={`Description`} />
+                  </ListItem>
+                  <Divider variant="middle" />
 
                   {data.tasks.docs.map(({ code, name, description }, index) => (
                     <ListItem key={index} role={undefined} dense button onClick={this.handleToggle(index)} className={classes.taskListItem}>
