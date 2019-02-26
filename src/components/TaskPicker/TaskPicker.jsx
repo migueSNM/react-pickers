@@ -38,7 +38,7 @@ class TaskPicker extends React.Component {
     });
   };
 
-  handleToggle = value => () => {
+  handleSelectItem = value => () => {
     const { checked } = this.state;
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -54,9 +54,31 @@ class TaskPicker extends React.Component {
     });
   };
 
+  handleSelectAll = ( { tasks: { docs } }) => event => {
+    const { checked } = this.state;
+    const newChecked = [...checked];
+
+    const selectAll = event.target.checked;
+
+    docs.map( ({ _id : taskId }) => {
+      const currentIndex = newChecked.indexOf(taskId);
+
+      if (currentIndex === -1 && selectAll) {
+        newChecked.push(taskId);
+      } else if (!selectAll) {
+        newChecked.splice(currentIndex, 1);
+      }
+      return true;
+    });
+
+    this.setState({
+      checked: newChecked,
+    });
+
+  };
+
   render() {
     const { classes } = this.props;
-
     return (
       <div>
         <Button onClick={this.toggleDrawer('bottom', true)}>Task Picker</Button>
@@ -86,17 +108,17 @@ class TaskPicker extends React.Component {
               return (
                 <List className={classes.taskList}>
                   <ListItem role={undefined} dense className={classes.taskListItem}>
-                    <Checkbox disabled />
+                    <Checkbox onChange={this.handleSelectAll(data)} value="selectAll"/>
                     <ListItemText className={classes.taskListItemText} secondary={`Code`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Name`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Description`} />
                   </ListItem>
                   <Divider variant="middle" />
 
-                  {data.tasks.docs.map(({ code, name, description }, index) => (
-                    <ListItem key={index} role={undefined} dense button onClick={this.handleToggle(index)} className={classes.taskListItem}>
+                  {data.tasks.docs.map(({ _id, code, name, description }, index) => (
+                    <ListItem key={index} role={undefined} dense button onClick={this.handleSelectItem(_id)} className={classes.taskListItem}>
                       <Checkbox
-                        checked={this.state.checked.indexOf(index) !== -1}
+                        checked={this.state.checked.indexOf(_id) !== -1}
                         tabIndex={-1}
                         disableRipple
                       />
