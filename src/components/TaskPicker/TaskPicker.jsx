@@ -15,6 +15,14 @@ const styles = {
   taskList: {
     width: '100%',
   },
+  taskListItem: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  taskListItemText: {
+    width: 10,
+  },
 };
 
 class TaskPicker extends React.Component {
@@ -64,6 +72,7 @@ class TaskPicker extends React.Component {
                     _id
                     code
                     name
+                    description
                   }
                 }
               }
@@ -75,14 +84,17 @@ class TaskPicker extends React.Component {
 
               return (
                 <List className={classes.taskList}>
-                  {data.tasks.docs.map(({ code, name }, index) => (
-                    <ListItem key={index} role={undefined} dense button onClick={this.handleToggle(index)}>
+
+                  {data.tasks.docs.map(({ code, name, description }, index) => (
+                    <ListItem key={index} role={undefined} dense button onClick={this.handleToggle(index)} className={classes.taskListItem}>
                       <Checkbox
                         checked={this.state.checked.indexOf(index) !== -1}
                         tabIndex={-1}
                         disableRipple
                       />
-                      <ListItemText primary={`${code}: ${name}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${code}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${name}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${description}`} />
                     </ListItem>
                   ))}
                 </List>
