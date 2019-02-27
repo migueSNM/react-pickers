@@ -8,6 +8,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Divider from '@material-ui/core/Divider';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import InputBase from '@material-ui/core/InputBase';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
@@ -31,15 +35,21 @@ const styles = {
     },
   },
   checked: {},
+  grow: {
+    flexGrow: 1,
+  },
 };
 
 class TaskPicker extends React.Component {
   state = {
     bottom: false,
     checked: [],
+    applied: [],
+    searchText: '',
   };
 
   toggleDrawer = (side, open) => () => {
+    // console.log('state ', this.state);
     this.setState({
       [side]: open,
     });
@@ -81,7 +91,18 @@ class TaskPicker extends React.Component {
     this.setState({
       checked: newChecked,
     });
+  };
 
+  handleSearchChange = () => event => {
+    this.setState({
+      searchText: event.target.value,
+    });
+  };
+
+  handleApply = () => () => {
+    this.setState({
+      applied: this.state.checked,
+    });
   };
 
   render() {
@@ -114,6 +135,18 @@ class TaskPicker extends React.Component {
 
               return (
                 <List className={classes.taskList}>
+                  <AppBar position="static">
+                    <Toolbar>
+                      <Typography variant="h6" color="inherit" className={classes.grow}>
+                        Tasks
+                      </Typography>
+                      <InputBase
+                        placeholder="Search…"
+                        onChange={this.handleSearchChange()}
+                      />
+                      <Button onClick={this.handleApply(data)} color="inherit">Apply</Button>
+                    </Toolbar>
+                  </AppBar>
                   <ListItem role={undefined} dense className={classes.taskListItem}>
                     <Checkbox
                       onChange={this.handleSelectAll(data)}
@@ -129,8 +162,20 @@ class TaskPicker extends React.Component {
                   </ListItem>
                   <Divider variant="middle" />
 
-                  {data.tasks.docs.map(({ _id, code, name, description }, index) => (
-                    <ListItem key={index} role={undefined} dense button onClick={this.handleSelectItem(_id)} className={classes.taskListItem}>
+                  {data.tasks.docs
+                    .filter(task =>
+                      Object.values(task).some(val =>
+                        val.includes(this.state.searchText)
+                      ))
+                    .map(({ _id, code, name, description }, index) => (
+                    <ListItem
+                      key={index}
+                      role={undefined}
+                      dense
+                      button
+                      onClick={this.handleSelectItem(_id)}
+                      className={classes.taskListItem}
+                    >
                       <Checkbox
                         checked={this.state.checked.indexOf(_id) !== -1}
                         tabIndex={-1}
@@ -139,7 +184,6 @@ class TaskPicker extends React.Component {
                           root: classes.checkbox,
                           checked: classes.checked,
                         }}
-                        // color="primary"
                       />
                       <ListItemText className={classes.taskListItemText} primary={`${code}`} />
                       <ListItemText className={classes.taskListItemText} primary={`${name}`} />
