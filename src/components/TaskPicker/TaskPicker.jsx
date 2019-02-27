@@ -68,6 +68,7 @@ class TaskPicker extends React.Component {
     // console.log('state ', this.state);
     this.setState({
       [side]: open,
+      searchText: '',
     });
   };
 
@@ -187,13 +188,9 @@ class TaskPicker extends React.Component {
                   <Divider variant="middle" />
 
                   {data.tasks.docs
-                    .filter(task => {
-                      delete task._id;
-                      return Object.values(task).some(val =>
-                          val.includes(this.state.searchText)
-                        )
-                      }
-                    )
+                    .filter(task => Object.entries(task).some(val =>
+                        val[0] !== '_id' && val[1].includes(this.state.searchText)
+                    ))
                     .map(({ _id, code, name, description }, index) => (
                     <ListItem
                       key={index}
