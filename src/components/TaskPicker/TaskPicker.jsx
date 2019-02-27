@@ -12,6 +12,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
+import SearchIcon from '@material-ui/icons/Search';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
@@ -38,6 +41,19 @@ const styles = {
   grow: {
     flexGrow: 1,
   },
+  searchBox: {
+    backgroundColor: '#FFFFFF61',
+    borderRadius: 10,
+    paddingLeft: 10,
+    alignItems: 'center',
+  },
+  searchBoxText: {
+    color: '#FFFFFF',
+  },
+  closeButton: {
+    color: '#FFFFFF',
+
+  }
 };
 
 class TaskPicker extends React.Component {
@@ -137,13 +153,21 @@ class TaskPicker extends React.Component {
                 <List className={classes.taskList}>
                   <AppBar position="static">
                     <Toolbar>
+                      <IconButton onClick={this.toggleDrawer('bottom', false)} className={classes.closeButton} aria-label="Close">
+                        <CloseIcon />
+                      </IconButton>
                       <Typography variant="h6" color="inherit" className={classes.grow}>
                         Tasks
                       </Typography>
-                      <InputBase
-                        placeholder="Search…"
-                        onChange={this.handleSearchChange()}
-                      />
+                      <div className={classes.searchBox}>
+                        <SearchIcon />
+                        <InputBase
+                          placeholder="Search…"
+                          className={classes.searchBoxText}
+                          onChange={this.handleSearchChange()
+                          }
+                        />
+                      </div>
                       <Button onClick={this.handleApply(data)} color="inherit">Apply</Button>
                     </Toolbar>
                   </AppBar>
