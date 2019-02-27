@@ -45,6 +45,7 @@ const styles = {
     backgroundColor: '#FFFFFF61',
     borderRadius: 10,
     paddingLeft: 10,
+    display: 'flex',
     alignItems: 'center',
   },
   searchBoxText: {
