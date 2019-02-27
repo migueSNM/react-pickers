@@ -24,6 +24,13 @@ const styles = {
   taskListItemText: {
     width: 10,
   },
+  checkbox: {
+    color: '#7b7b7b',
+    '&$checked': {
+      color: '#0288D1',
+    },
+  },
+  checked: {},
 };
 
 class TaskPicker extends React.Component {
@@ -108,7 +115,14 @@ class TaskPicker extends React.Component {
               return (
                 <List className={classes.taskList}>
                   <ListItem role={undefined} dense className={classes.taskListItem}>
-                    <Checkbox onChange={this.handleSelectAll(data)} value="selectAll"/>
+                    <Checkbox
+                      onChange={this.handleSelectAll(data)}
+                      value="selectAll"
+                      classes={{
+                        root: classes.checkbox,
+                        checked: classes.checked,
+                      }}
+                    />
                     <ListItemText className={classes.taskListItemText} secondary={`Code`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Name`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Description`} />
@@ -121,6 +135,11 @@ class TaskPicker extends React.Component {
                         checked={this.state.checked.indexOf(_id) !== -1}
                         tabIndex={-1}
                         disableRipple
+                        classes={{
+                          root: classes.checkbox,
+                          checked: classes.checked,
+                        }}
+                        // color="primary"
                       />
                       <ListItemText className={classes.taskListItemText} primary={`${code}`} />
                       <ListItemText className={classes.taskListItemText} primary={`${name}`} />
