@@ -163,10 +163,13 @@ class TaskPicker extends React.Component {
                   <Divider variant="middle" />
 
                   {data.tasks.docs
-                    .filter(task =>
-                      Object.values(task).some(val =>
-                        val.includes(this.state.searchText)
-                      ))
+                    .filter(task => {
+                      delete task._id;
+                      return Object.values(task).some(val =>
+                          val.includes(this.state.searchText)
+                        )
+                      }
+                    )
                     .map(({ _id, code, name, description }, index) => (
                     <ListItem
                       key={index}
