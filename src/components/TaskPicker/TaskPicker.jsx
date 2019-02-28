@@ -20,8 +20,12 @@ import gql from "graphql-tag";
 
 
 const styles = {
+  drawer: {
+    height: '100%',
+  },
   taskList: {
     width: '100%',
+    paddingTop: 0,
   },
   taskListItem: {
     flex: 1,
@@ -137,6 +141,9 @@ class TaskPicker extends React.Component {
           anchor="bottom"
           open={this.state.bottom}
           onClose={this.toggleDrawer('bottom', false)}
+          classes={{
+            paperAnchorBottom: classes.drawer,
+          }}
         >
           <Query
             query={gql`
