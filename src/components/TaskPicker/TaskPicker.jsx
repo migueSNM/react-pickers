@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -15,6 +15,10 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import SortIcon from '@material-ui/icons/Sort';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
@@ -57,7 +61,12 @@ const styles = {
   },
   closeButton: {
     color: '#FFFFFF',
-
+  },
+  filterButton: {
+    color: '#FFFFFF',
+  },
+  sortButton: {
+    color: '#FFFFFF',
   }
 };
 
@@ -70,9 +79,11 @@ function compareStringCaseInsensitive (string, searchString) {
 class TaskPicker extends React.Component {
   state = {
     bottom: false,
+    rightDrawer: false,
     checked: [],
     applied: [],
     searchText: '',
+    rightDrawerValue: 0,
   };
 
   toggleDrawer = (side, open) => () => {
@@ -82,6 +93,14 @@ class TaskPicker extends React.Component {
       searchText: '',
     });
   };
+
+  toggleRightDrawer = () => {
+
+    this.setState({
+      rightDrawer: !this.state.rightDrawer,
+    });
+  };
+
 
   handleSelectItem = value => () => {
     const { checked } = this.state;
@@ -127,6 +146,12 @@ class TaskPicker extends React.Component {
     });
   };
 
+  handleTabChange = (event, value) => {
+    this.setState({
+      rightDrawerValue: value
+    });
+  };
+
   handleApply = () => {
     const checkedIds = this.state.checked;
     this.props.handleReturnedIds(checkedIds)
@@ -168,6 +193,7 @@ class TaskPicker extends React.Component {
               if (error) return <p>Error :(</p>;
 
               return (
+              <Fragment>
                 <List className={classes.taskList}>
                   <AppBar position="static">
                     <Toolbar>
@@ -186,6 +212,12 @@ class TaskPicker extends React.Component {
                           }
                         />
                       </div>
+                      <IconButton onClick={this.toggleRightDrawer} className={classes.sortButton} aria-label="Sort">
+                        <SortIcon />
+                      </IconButton>
+                      <IconButton onClick={this.toggleRightDrawer} className={classes.filterButton} aria-label="Filter">
+                        <FilterListIcon />
+                      </IconButton>
                       <Button onClick={this.handleApply} color="inherit">Apply</Button>
                     </Toolbar>
                   </AppBar>
@@ -236,6 +268,35 @@ class TaskPicker extends React.Component {
                     </ListItem>
                   ))}
                 </List>
+                <Drawer
+                  anchor="right"
+                  open={this.state.rightDrawer}
+                  onClose={this.toggleRightDrawer}
+                >
+                  <Tabs
+                    value={this.state.rightDrawerValue}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    onChange={this.handleTabChange}
+                  >
+                    <Tab label="Sort" />
+                    <Tab label="Filter" />
+                  </Tabs>
+                  {this.state.rightDrawerValue === 0 && (
+                    <List component="nav">
+                      Sort
+                      {Object.keys(data.tasks.docs[0]).map(column =>
+                        !column.startsWith('_') &&
+                        (
+                          <ListItem button key={column}>
+                            <ListItemText primary={column} />
+                          </ListItem>
+                        ))
+                      }
+                    </List>
+                  )}
+                </Drawer>
+              </Fragment>
               );
             }}
           </Query>
