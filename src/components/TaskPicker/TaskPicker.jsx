@@ -154,6 +154,10 @@ class TaskPicker extends React.Component {
                     code
                     name
                     description
+                    price
+                    type {
+                      name
+                    }
                   }
                 }
               }
@@ -197,6 +201,8 @@ class TaskPicker extends React.Component {
                     <ListItemText className={classes.taskListItemText} secondary={`Code`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Name`} />
                     <ListItemText className={classes.taskListItemText} secondary={`Description`} />
+                    <ListItemText className={classes.taskListItemText} secondary={`Price`} />
+                    <ListItemText className={classes.taskListItemText} secondary={`Type`} />
                   </ListItem>
                   <Divider variant="middle" />
 
@@ -204,7 +210,7 @@ class TaskPicker extends React.Component {
                     .filter(task => Object.entries(task).some(val =>
                         val[0] !== '_id' && compareStringCaseInsensitive(val[1], this.state.searchText)
                     ))
-                    .map(({ _id, code, name, description }, index) => (
+                    .map(({ _id, code, name, description, price, type}, index) => (
                     <ListItem
                       key={index}
                       role={undefined}
@@ -222,9 +228,11 @@ class TaskPicker extends React.Component {
                           checked: classes.checked,
                         }}
                       />
-                      <ListItemText className={classes.taskListItemText} primary={`${code}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${name}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${description}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${code ? code : ''}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${name ? name : ''}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${description ? description : ''}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${price ? price : ''}`} />
+                      <ListItemText className={classes.taskListItemText} primary={`${type ? type.name : ''}`} />
                     </ListItem>
                   ))}
                 </List>
