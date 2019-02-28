@@ -123,10 +123,9 @@ class TaskPicker extends React.Component {
     });
   };
 
-  handleApply = () => () => {
-    this.setState({
-      applied: this.state.checked,
-    });
+  handleApply = () => {
+    const checkedIds = this.state.checked;
+    this.props.handleReturnedIds(checkedIds)
   };
 
   render() {
@@ -176,7 +175,7 @@ class TaskPicker extends React.Component {
                           }
                         />
                       </div>
-                      <Button onClick={this.handleApply(data)} color="inherit">Apply</Button>
+                      <Button onClick={this.handleApply} color="inherit">Apply</Button>
                     </Toolbar>
                   </AppBar>
                   <ListItem role={undefined} dense className={classes.taskListItem}>
