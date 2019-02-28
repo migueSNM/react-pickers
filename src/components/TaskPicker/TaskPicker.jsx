@@ -57,6 +57,12 @@ const styles = {
   }
 };
 
+function compareStringCaseInsensitive (string, searchString) {
+  const str = string ? (string + '').toUpperCase() : '';
+  const searchStr = searchString ? (searchString + '').toUpperCase() : '';
+  return str.indexOf(searchStr) !== -1;
+}
+
 class TaskPicker extends React.Component {
   state = {
     bottom: false,
@@ -190,7 +196,7 @@ class TaskPicker extends React.Component {
 
                   {data.tasks.docs
                     .filter(task => Object.entries(task).some(val =>
-                        val[0] !== '_id' && val[1].includes(this.state.searchText)
+                        val[0] !== '_id' && compareStringCaseInsensitive(val[1], this.state.searchText)
                     ))
                     .map(({ _id, code, name, description }, index) => (
                     <ListItem
