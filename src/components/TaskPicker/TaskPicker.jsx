@@ -76,6 +76,27 @@ function compareStringCaseInsensitive (string, searchString) {
   return str.indexOf(searchStr) !== -1;
 }
 
+function dynamicSort(property) {
+  let sortOrder = 1;
+
+  if(property[0] === "-") {
+    sortOrder = -1;
+    property = property.substr(1);
+  }
+
+  return function (a,b) {
+
+    const formatA = a[property] ? a[property].toString() : '';
+    const formatB = b[property] ? b[property].toString() : '';
+
+    if(sortOrder === -1){
+      return formatB.localeCompare(formatA);
+    }else{
+      return formatA.localeCompare(formatB);
+    }
+  }
+}
+
 class TaskPicker extends React.Component {
   state = {
     bottom: false,
@@ -84,6 +105,7 @@ class TaskPicker extends React.Component {
     applied: [],
     searchText: '',
     rightDrawerValue: 0,
+    sortBy: 'code',
   };
 
   toggleDrawer = (side, open) => () => {
@@ -143,6 +165,12 @@ class TaskPicker extends React.Component {
   handleSearchChange = () => event => {
     this.setState({
       searchText: event.target.value,
+    });
+  };
+
+  handleSort = columnName => () => {
+    this.setState({
+      sortBy: columnName,
     });
   };
 
@@ -242,6 +270,7 @@ class TaskPicker extends React.Component {
                     .filter(task => Object.entries(task).some(val =>
                         val[0] !== '_id' && compareStringCaseInsensitive(val[1], this.state.searchText)
                     ))
+                    .sort(dynamicSort(this.state.sortBy))
                     .map(({ _id, code, name, description, price, type}, index) => (
                     <ListItem
                       key={index}
@@ -288,8 +317,8 @@ class TaskPicker extends React.Component {
                       {Object.keys(data.tasks.docs[0]).map(column =>
                         !column.startsWith('_') &&
                         (
-                          <ListItem button key={column}>
-                            <ListItemText primary={column} />
+                          <ListItem button key={column} onClick={this.handleSort(column)}>
+                            <ListItemText primary={column}/>
                           </ListItem>
                         ))
                       }
