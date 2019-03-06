@@ -4,7 +4,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Divider from '@material-ui/core/Divider';
@@ -17,6 +19,11 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import SortIcon from '@material-ui/icons/Sort';
+import CodeIcon from '@material-ui/icons/Code';
+import LabelIcon from '@material-ui/icons/Label';
+import FilterNoneIcon from '@material-ui/icons/FilterNone';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Query } from "react-apollo";
@@ -109,7 +116,6 @@ class TaskPicker extends React.Component {
   };
 
   toggleDrawer = (side, open) => () => {
-    // console.log('state ', this.state);
     this.setState({
       [side]: open,
       searchText: '',
@@ -312,12 +318,21 @@ class TaskPicker extends React.Component {
                     <Tab label="Filter" />
                   </Tabs>
                   {this.state.rightDrawerValue === 0 && (
-                    <List component="nav">
-                      Sort
+                    <List
+                      component="nav"
+                      subheader={<ListSubheader component="div">Sort by</ListSubheader>}
+                    >
                       {Object.keys(data.tasks.docs[0]).map(column =>
                         !column.startsWith('_') &&
                         (
                           <ListItem button key={column} onClick={this.handleSort(column)}>
+                            <ListItemIcon>
+                              {column === 'code' ? <CodeIcon /> : ''}
+                              {column === 'name' ? <LabelIcon /> : ''}
+                              {column === 'type' ? <FilterNoneIcon /> : ''}
+                              {column === 'price' ? <AttachMoneyIcon /> : ''}
+                              {column === 'description' ? <LibraryBooksIcon /> : ''}
+                            </ListItemIcon>
                             <ListItemText primary={column}/>
                           </ListItem>
                         ))
