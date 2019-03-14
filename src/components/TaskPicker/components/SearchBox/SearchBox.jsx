@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
   searchBox: {
-    // backgroundColor: '#FFFFFF61',
     borderRadius: 10,
     paddingLeft: 10,
     display: 'flex',

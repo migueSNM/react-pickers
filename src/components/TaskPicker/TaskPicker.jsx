@@ -20,6 +20,8 @@ import Tab from '@material-ui/core/Tab';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import Dialog from '@material-ui/core/Dialog';
+import Slide from '@material-ui/core/Slide';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import CloseButton from './components/CloseButton';
@@ -49,6 +51,7 @@ const styles = {
   },
   taskListItemText: {
     width: 10,
+    wordWrap: 'break-word'
   },
   checkbox: {
     color: '#7b7b7b',
@@ -61,6 +64,10 @@ const styles = {
     flexGrow: 1,
   },
 };
+
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 function compareStringCaseInsensitive (string, searchString) {
   const str = string ? (string + '').toUpperCase() : '';
@@ -331,19 +338,19 @@ class TaskPicker extends React.Component {
                         </Toolbar>
                       ) : (
                         <div>
-                          <SearchBox handleSearchChange={this.handleSearchChange} />
                           <Toolbar>
                             <CloseButton closeDrawer={this.closeDrawer} />
                             <Typography variant="h6" color="inherit" className={classes.grow}>
                               Tasks
                             </Typography>
+                            <Chip label={this.state.checked.length} className={classes.counterChip}/>
                             <SortButton toggleRightDrawer={this.toggleRightDrawer}/>
                             <FilterButton toggleRightDrawer={this.toggleRightDrawer} handleFilterBadge={this.handleFilterBadge}/>
                             <DoneButton handleConfirm={this.handleConfirm}/>
                           </Toolbar>
+                          <SearchBox handleSearchChange={this.handleSearchChange} />
                         </div>
                       )
-
                       }
                     </Media>
                   </AppBar>
@@ -430,34 +437,40 @@ class TaskPicker extends React.Component {
                     </ListItem>
                   ))}
                 </List>
-                <Drawer
-                  anchor="right"
+                <Dialog
                   open={this.state.rightDrawer}
                   onClose={this.toggleRightDrawer}
+                  TransitionComponent={Transition}
+                  keepMounted
+                  fullScreen
                 >
                   <Tabs
                     value={this.state.rightDrawerValue}
                     indicatorColor="primary"
                     textColor="primary"
                     onChange={this.handleTabChange}
+                    variant="fullWidth"
                   >
                     <Tab label="Sort" />
                     <Tab label="Filter" />
                   </Tabs>
                   {this.state.rightDrawerValue === 0 && (
-                    <List component="nav">
-                      {Object.keys(data.tasks.docs[0]).map(column =>
-                        !column.startsWith('_') &&
-                        (
-                          <ListItem button key={column} onClick={this.handleSort(column)}>
-                            <ListItemIcon>
-                              <LibraryBooksIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={column}/>
-                          </ListItem>
-                        ))
-                      }
-                    </List>
+                    <Fragment>
+                      <List component="nav">
+                        {Object.keys(data.tasks.docs[0]).map(column =>
+                          !column.startsWith('_') &&
+                          (
+                            <ListItem button key={column} onClick={this.handleSort(column)} selected={this.state.sortBy === column}>
+                              <ListItemIcon>
+                                <LibraryBooksIcon />
+                              </ListItemIcon>
+                              <ListItemText primary={column}/>
+                            </ListItem>
+                          ))
+                        }
+                      </List>
+                      <Button onClick={this.toggleRightDrawer} color="inherit">Close Sorters</Button>
+                    </Fragment>
                   )}
                   {this.state.rightDrawerValue === 1 && (
                     <Fragment>
@@ -490,10 +503,11 @@ class TaskPicker extends React.Component {
                       </List>
                       <Button onClick={this.handleApplyFilter} color="inherit">Apply Filters</Button>
                       <Button onClick={this.handleCleanFilter} color="inherit">Clean Filters</Button>
+                      <Button onClick={this.toggleRightDrawer} color="inherit">Close Filters</Button>
                     </Fragment>
 
                   )}
-                </Drawer>
+                </Dialog>
               </Fragment>
               );
             }}
