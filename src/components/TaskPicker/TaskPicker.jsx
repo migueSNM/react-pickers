@@ -1,4 +1,5 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from 'react'
+import Media from "react-media";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -12,24 +13,20 @@ import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import Chip from '@material-ui/core/Chip';
-import DoneIcon from '@material-ui/icons/Done';
-import SortIcon from '@material-ui/icons/Sort';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import Badge from '@material-ui/core/Badge';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import { omit, groupBy, mapObject } from 'underscore';
+import CloseButton from './components/CloseButton';
+import SearchBox from './components/SearchBox';
+import SortButton from "./components/SortButton";
+import FilterButton from "./components/FilterButton";
+import DoneButton from "./components/DoneButton/DoneButton";
 
 
 const styles = {
@@ -63,25 +60,6 @@ const styles = {
   grow: {
     flexGrow: 1,
   },
-  searchBox: {
-    backgroundColor: '#FFFFFF61',
-    borderRadius: 10,
-    paddingLeft: 10,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  searchBoxText: {
-    color: '#FFFFFF',
-  },
-  closeButton: {
-    color: '#FFFFFF',
-  },
-  filterButton: {
-    color: '#FFFFFF',
-  },
-  sortButton: {
-    color: '#FFFFFF',
-  }
 };
 
 function compareStringCaseInsensitive (string, searchString) {
@@ -136,9 +114,15 @@ class TaskPicker extends React.Component {
     },
   };
 
-  toggleDrawer = (side, open) => () => {
+  closeDrawer = () => {
     this.setState({
-      [side]: open,
+      bottom: false,
+    });
+  };
+
+  openDrawer = () => {
+    this.setState({
+      bottom: true,
       searchText: '',
     });
   };
@@ -158,25 +142,25 @@ class TaskPicker extends React.Component {
     });
   };
 
-  handleSelectFilterOption = (columnValue, columnName) => () => {
-
-    const { filterChecked } = this.state;
-    const currentIndex = filterChecked.map(function(e) { return e.value; }).indexOf(columnValue);
-    const newFilterChecked = [...filterChecked];
-
-    if (currentIndex === -1) {
-      newFilterChecked.push({
-        colName: columnName,
-        value: columnValue
-      });
-    } else {
-      newFilterChecked.splice(currentIndex, 1);
-    }
-
-    this.setState({
-      filterChecked: newFilterChecked,
-    });
-  };
+  // handleSelectFilterOption = (columnValue, columnName) => () => {
+  //
+  //   const { filterChecked } = this.state;
+  //   const currentIndex = filterChecked.map(function(e) { return e.value; }).indexOf(columnValue);
+  //   const newFilterChecked = [...filterChecked];
+  //
+  //   if (currentIndex === -1) {
+  //     newFilterChecked.push({
+  //       colName: columnName,
+  //       value: columnValue
+  //     });
+  //   } else {
+  //     newFilterChecked.splice(currentIndex, 1);
+  //   }
+  //
+  //   this.setState({
+  //     filterChecked: newFilterChecked,
+  //   });
+  // };
 
   handleSelectFilterDeleted = () => {
     const newFilterChecked = {...this.state.filterChecked};
@@ -284,11 +268,11 @@ class TaskPicker extends React.Component {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
-        <Button onClick={this.toggleDrawer('bottom', true)}>Task Picker</Button>
+        <Button onClick={this.openDrawer}>Task Picker</Button>
         <Drawer
           anchor="bottom"
           open={this.state.bottom}
-          onClose={this.toggleDrawer('bottom', false)}
+          onClose={this.closeDrawer}
           classes={{
             paperAnchorBottom: classes.drawer,
           }}
@@ -332,50 +316,69 @@ class TaskPicker extends React.Component {
               <Fragment>
                 <List className={classes.taskList}>
                   <AppBar position="static">
-                    <Toolbar>
-                      <IconButton onClick={this.toggleDrawer('bottom', false)} className={classes.closeButton} aria-label="Close">
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography variant="h6" color="inherit" className={classes.grow}>
-                        Tasks
-                        <Chip label={this.state.checked.length} className={classes.counterChip}/>
-                      </Typography>
-                      <div className={classes.searchBox}>
-                        <SearchIcon />
-                        <InputBase
-                          placeholder="Search…"
-                          className={classes.searchBoxText}
-                          onChange={this.handleSearchChange()}
-                        />
-                      </div>
-                      <IconButton onClick={this.toggleRightDrawer} className={classes.sortButton} aria-label="Sort">
-                        <SortIcon />
-                      </IconButton>
-                      <IconButton onClick={this.toggleRightDrawer} className={classes.filterButton} aria-label="Filter">
-                        <Badge color="secondary" variant="dot" invisible={this.handleFilterBadge()}>
-                          <FilterListIcon />
-                        </Badge>
-                      </IconButton>
-                      <IconButton onClick={this.handleConfirm} color="inherit" aria-label="Confirm">
-                        <DoneIcon />
-                      </IconButton>
-                    </Toolbar>
+                    <Media query="(min-width: 768px)">
+                      {match => match ? (
+                        <Toolbar>
+                          <CloseButton closeDrawer={this.closeDrawer} />
+                          <Typography variant="h6" color="inherit" className={classes.grow}>
+                            Tasks
+                            <Chip label={this.state.checked.length} className={classes.counterChip}/>
+                          </Typography>
+                          <SearchBox handleSearchChange={this.handleSearchChange} />
+                          <SortButton toggleRightDrawer={this.toggleRightDrawer}/>
+                          <FilterButton toggleRightDrawer={this.toggleRightDrawer} handleFilterBadge={this.handleFilterBadge}/>
+                          <DoneButton handleConfirm={this.handleConfirm}/>
+                        </Toolbar>
+                      ) : (
+                        <div>
+                          <SearchBox handleSearchChange={this.handleSearchChange} />
+                          <Toolbar>
+                            <CloseButton closeDrawer={this.closeDrawer} />
+                            <Typography variant="h6" color="inherit" className={classes.grow}>
+                              Tasks
+                            </Typography>
+                            <SortButton toggleRightDrawer={this.toggleRightDrawer}/>
+                            <FilterButton toggleRightDrawer={this.toggleRightDrawer} handleFilterBadge={this.handleFilterBadge}/>
+                            <DoneButton handleConfirm={this.handleConfirm}/>
+                          </Toolbar>
+                        </div>
+                      )
+
+                      }
+                    </Media>
                   </AppBar>
-                  <ListItem role={undefined} dense className={classes.taskListItem}>
-                    <Checkbox
-                      onChange={this.handleSelectAll(data)}
-                      value="selectAll"
-                      classes={{
-                        root: classes.checkbox,
-                        checked: classes.checked,
-                      }}
-                    />
-                    <ListItemText className={classes.taskListItemText} secondary={`Code`} />
-                    <ListItemText className={classes.taskListItemText} secondary={`Name`} />
-                    <ListItemText className={classes.taskListItemText} secondary={`Description`} />
-                    <ListItemText className={classes.taskListItemText} secondary={`Price`} />
-                    <ListItemText className={classes.taskListItemText} secondary={`Type`} />
-                  </ListItem>
+                  <Media query="(min-width: 768px)">
+                    {match => match ? (
+                      <ListItem role={undefined} dense className={classes.taskListItem}>
+                        <Checkbox
+                          onChange={this.handleSelectAll(data)}
+                          value="selectAll"
+                          classes={{
+                            root: classes.checkbox,
+                            checked: classes.checked,
+                          }}
+                        />
+                        <ListItemText className={classes.taskListItemText} secondary={`Code`} />
+                        <ListItemText className={classes.taskListItemText} secondary={`Name`} />
+                        <ListItemText className={classes.taskListItemText} secondary={`Description`} />
+                        <ListItemText className={classes.taskListItemText} secondary={`Price`} />
+                        <ListItemText className={classes.taskListItemText} secondary={`Type`} />
+                      </ListItem>
+                    ) : (
+                      <ListItem role={undefined} dense className={classes.taskListItem}>
+                        <Checkbox
+                          onChange={this.handleSelectAll(data)}
+                          value="selectAll"
+                          classes={{
+                            root: classes.checkbox,
+                            checked: classes.checked,
+                          }}
+                        />
+                        <ListItemText className={classes.taskListItemText} secondary={`Code`} />
+                      </ListItem>
+                    )
+                    }
+                  </Media>
                   <Divider variant="middle" />
 
                   {data.tasks.docs
@@ -408,11 +411,22 @@ class TaskPicker extends React.Component {
                           checked: classes.checked,
                         }}
                       />
-                      <ListItemText className={classes.taskListItemText} primary={`${code ? code : ''}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${name ? name : ''}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${description ? description : ''}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${price ? price : ''}`} />
-                      <ListItemText className={classes.taskListItemText} primary={`${type ? type.name : ''}`} />
+                      <Media query="(min-width: 768px)">
+                        {match => match ? (
+                          <Fragment>
+                            <ListItemText className={classes.taskListItemText} primary={`${code ? code : ''}`} />
+                            <ListItemText className={classes.taskListItemText} primary={`${name ? name : ''}`} />
+                            <ListItemText className={classes.taskListItemText} primary={`${description ? description : ''}`} />
+                            <ListItemText className={classes.taskListItemText} primary={`${price ? price : ''}`} />
+                            <ListItemText className={classes.taskListItemText} primary={`${type ? type.name : ''}`} />
+                          </Fragment>
+                        ) : (
+                          <Fragment>
+                            <ListItemText className={classes.taskListItemText} primary={`${code ? code : ''}`} />
+                          </Fragment>
+                        )
+                        }
+                      </Media>
                     </ListItem>
                   ))}
                 </List>
