@@ -6,7 +6,6 @@ import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Divider from '@material-ui/core/Divider';
@@ -14,21 +13,20 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import Dialog from '@material-ui/core/Dialog';
 import Slide from '@material-ui/core/Slide';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
+
 import CloseButton from './components/CloseButton';
 import SearchBox from './components/SearchBox';
 import SortButton from "./components/SortButton";
 import FilterButton from "./components/FilterButton";
-import DoneButton from "./components/DoneButton/DoneButton";
+import DoneButton from "./components/DoneButton";
+import FilterOptions from "./components/FilterOptions";
+import SortOptions from "./components/SortOptions";
 
 
 const styles = {
@@ -455,57 +453,23 @@ class TaskPicker extends React.Component {
                     <Tab label="Filter" />
                   </Tabs>
                   {this.state.rightDrawerValue === 0 && (
-                    <Fragment>
-                      <List component="nav">
-                        {Object.keys(data.tasks.docs[0]).map(column =>
-                          !column.startsWith('_') &&
-                          (
-                            <ListItem button key={column} onClick={this.handleSort(column)} selected={this.state.sortBy === column}>
-                              <ListItemIcon>
-                                <LibraryBooksIcon />
-                              </ListItemIcon>
-                              <ListItemText primary={column}/>
-                            </ListItem>
-                          ))
-                        }
-                      </List>
-                      <Button onClick={this.toggleRightDrawer} color="inherit">Close Sorters</Button>
-                    </Fragment>
+                    <SortOptions
+                      taskColumns={data.tasks.docs[0]}
+                      handleSort={this.handleSort}
+                      toggleRightDrawer={this.toggleRightDrawer}
+                      sortBy={this.state.sortBy}
+                    />
                   )}
                   {this.state.rightDrawerValue === 1 && (
-                    <Fragment>
-                      <List component="nav">
-                        <ListItem button key="status" onClick={this.handleOpenFilterOption}>
-                          <ListItemText inset primary="status" />
-                          {this.state.filterNestedOpen.status ? <ExpandLess /> : <ExpandMore />}
-                        </ListItem>
-                        <Collapse in={this.state.filterNestedOpen.status} timeout="auto" unmountOnExit>
-                          <ListItem
-                            key="deleted"
-                            role={undefined}
-                            dense
-                            button
-                            onClick={this.handleSelectFilterDeleted}
-                            className={classes.taskListItem}
-                          >
-                            <Checkbox
-                              checked={this.state.filterChecked.deleted}
-                              tabIndex={-1}
-                              disableRipple
-                              classes={{
-                                root: classes.checkbox,
-                                checked: classes.checked,
-                              }}
-                            />
-                            <ListItemText className={classes.taskListItemText} primary='Show deleted' />
-                          </ListItem>
-                        </Collapse>
-                      </List>
-                      <Button onClick={this.handleApplyFilter} color="inherit">Apply Filters</Button>
-                      <Button onClick={this.handleCleanFilter} color="inherit">Clean Filters</Button>
-                      <Button onClick={this.toggleRightDrawer} color="inherit">Close Filters</Button>
-                    </Fragment>
-
+                      <FilterOptions
+                        handleOpenFilterOption={this.handleOpenFilterOption}
+                        handleSelectFilterDeleted={this.handleSelectFilterDeleted}
+                        handleApplyFilter={this.handleApplyFilter}
+                        handleCleanFilter={this.handleCleanFilter}
+                        toggleRightDrawer={this.toggleRightDrawer}
+                        filterNestedOpenStatus={this.state.filterNestedOpen.status}
+                        filterCheckedDeleted={this.state.filterChecked.deleted}
+                      />
                   )}
                 </Dialog>
               </Fragment>
